@@ -1,0 +1,9 @@
+# Client env
+client/.env
+
+# Server env
+server/.env
+
+# Common ignores
+node_modules/
+dist/
