@@ -1,1 +1,6 @@
-export const auth = null;
+export const auth = {
+  onAuthStateChanged: (callback) => {
+    callback(null);
+    return () => {};
+  },
+};
