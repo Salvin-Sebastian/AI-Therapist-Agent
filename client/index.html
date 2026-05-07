@@ -2,12 +2,148 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+    <link rel="icon" type="image/png" href="/logo.png" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+
+    <title>AI Therapist Agent | Your Safe Mental Wellness Companion</title>
+
+    <meta
+      name="description"
+      content="Talk freely with an AI-powered therapist companion designed to support mental wellness, emotional clarity, and personal growth."
+    />
+
+    <meta
+      name="keywords"
+      content="AI therapist, mental health AI, therapy chatbot, emotional support, wellness assistant"
+    />
+
+    <meta name="author" content="Salvin Sebastian" />
+
+    <meta name="theme-color" content="#0f172a" />
+
+    <meta property="og:title" content="AI Therapist Agent" />
+
+    <meta
+      property="og:description"
+      content="A calming AI companion for emotional support and wellness conversations."
+    />
+
+    <meta property="og:type" content="website" />
+
+    <meta property="og:image" content="/preview.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #111827 40%,
+          #1e293b 100%
+        );
+        color: white;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      #root {
+        min-height: 100vh;
+      }
+
+      .app-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #111827 40%,
+          #1e293b 100%
+        );
+        z-index: 9999;
+      }
+
+      .loader-circle {
+        width: 70px;
+        height: 70px;
+        border: 5px solid rgba(255, 255, 255, 0.15);
+        border-top-color: #38bdf8;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .loader-text {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: 500;
+        color: #e2e8f0;
+        letter-spacing: 0.5px;
+      }
+
+      .loader-sub {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #94a3b8;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
+
   <body>
+    <div class="app-loader" id="app-loader">
+      <div class="loader-circle"></div>
+
+      <div class="loader-text">
+        AI Therapist Agent
+      </div>
+
+      <div class="loader-sub">
+        Preparing your safe space...
+      </div>
+    </div>
+
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      window.addEventListener("load", () => {
+        const loader = document.getElementById("app-loader");
+
+        setTimeout(() => {
+          loader.style.opacity = "0";
+          loader.style.transition = "0.4s ease";
+
+          setTimeout(() => {
+            loader.remove();
+          }, 400);
+        }, 600);
+      });
+    </script>
   </body>
 </html>
