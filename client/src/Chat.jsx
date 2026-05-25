@@ -515,7 +515,7 @@ export default function Chat({ user, logout }) {
           <div className="absolute top-1/4 left-1/4 w-[35%] h-[35%] rounded-full bg-therapeutic-500/5 blur-3xl pointer-events-none"></div>
           <div className="absolute bottom-1/4 right-1/4 w-[35%] h-[35%] rounded-full bg-therapeutic-300/5 blur-3xl pointer-events-none" style={{ animationDelay: '2s' }}></div>
 
-          <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col">
+          <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col transition-transform md:translate-x-6 lg:translate-x-12">
             {messages.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 md:space-y-5 relative z-10 animate-fade-in py-12 px-4">
                 <div className="text-6xl md:text-7xl mb-2 drop-shadow-md animate-pulse">✨</div>
@@ -573,7 +573,7 @@ export default function Chat({ user, logout }) {
         </div>
 
         <div className="p-3 pb-5 md:p-6 md:pb-8 bg-slate-900/60 backdrop-blur-xl border-t border-slate-800/40 z-10 shadow-[0_-10px_40px_rgba(0,0,0,0.3)] shrink-0">
-          <div className="max-w-3xl mx-auto relative flex items-center gap-2 md:gap-3 bg-slate-800 border border-slate-700/30 rounded-full shadow-sm p-1.5 focus-within:ring-4 focus-within:ring-therapeutic-500/20 focus-within:border-therapeutic-500/40 transition-all">
+          <div className="max-w-3xl mx-auto relative flex items-center gap-2 md:gap-3 bg-slate-800 border border-slate-700/30 rounded-full shadow-sm p-1.5 focus-within:ring-4 focus-within:ring-therapeutic-500/20 focus-within:border-therapeutic-500/40 transition-all md:translate-x-6 lg:translate-x-12">
             <input
               type="text"
               value={input}
