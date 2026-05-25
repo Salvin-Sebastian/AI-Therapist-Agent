@@ -223,11 +223,20 @@ const PORT = process.env.PORT || 5000;
 connectDB()
   .then(() => {
     console.log("✅ MongoDB connected");
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-    });
+    // Only listen if not running in Vercel (Vercel sets its own environment variables, but NODE_ENV=production is common)
+    // Actually, Vercel will handle the export. Local dev still needs app.listen.
+    if (process.env.NODE_ENV !== "production") {
+      app.listen(PORT, () => {
+        console.log(`✅ Server running on port ${PORT}`);
+      });
+    }
   })
   .catch((err) => {
     console.error("❌ Failed to connect to DB", err);
-    process.exit(1);
+    if (process.env.NODE_ENV !== "production") {
+      process.exit(1);
+    }
   });
+
+// Export the Express API for Vercel
+export default app;
