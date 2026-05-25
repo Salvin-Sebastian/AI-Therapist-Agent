@@ -1,6 +1,28 @@
 import { useState, useEffect, useRef } from "react";
+import { db } from "./firebase";
+import { collection, doc, setDoc, getDocs, getDoc, deleteDoc, query, where, orderBy, updateDoc, serverTimestamp } from "firebase/firestore";
+import Groq from "groq-sdk";
+import { v4 as uuidv4 } from "uuid";
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : "https://ai-therapist-agent-xi.vercel.app");
+const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY, dangerouslyAllowBrowser: true });
+
+const CRISIS_KEYWORDS = [
+  "kill myself",
+  "end my life",
+  "suicide",
+  "self harm",
+  "hurt myself",
+  "hurt someone",
+  "kill someone",
+  "want to die",
+  "can't go on",
+  "no reason to live",
+  "feel hopeless"
+];
+
+function detectCrisis(text) {
+  return CRISIS_KEYWORDS.some(k => text.toLowerCase().includes(k));
+}
 
 export default function Chat({ user }) {
   const isAnonymous = user.isAnonymous;
@@ -32,9 +54,10 @@ export default function Chat({ user }) {
   const fetchSessions = async () => {
     if (isAnonymous) return;
     try {
-      const res = await fetch(`${API_URL}/sessions?userId=${userId}`);
-      const data = await res.json();
-      setSessions(data || []);
+      const q = query(collection(db, "sessions"), where("userId", "==", userId), where("saved", "==", true), orderBy("updatedAt", "desc"));
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs.map(doc => ({ sessionId: doc.id, ...doc.data() }));
+      setSessions(data);
     } catch (err) {
       console.error("Failed to fetch sessions", err);
     }
@@ -53,9 +76,13 @@ export default function Chat({ user }) {
 
     const fetchMessages = async () => {
       try {
-        const res = await fetch(`${API_URL}/sessions/${sessionId}?userId=${userId}`);
-        const data = await res.json();
-        setMessages(data.messages || []);
+        const docRef = doc(db, "sessions", sessionId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().userId === userId) {
+          setMessages(docSnap.data().messages || []);
+        } else {
+          setMessages([]);
+        }
       } catch (err) {
         console.error(err);
         setMessages([]);
@@ -79,52 +106,74 @@ export default function Chat({ user }) {
     setLoading(true);
     setCrisisAlert(false);
 
-    // Optimistically add user message
-    setMessages(prev => [
-      ...prev,
-      { role: "user", content: userText }
-    ]);
+    const newMessages = [...messages, { role: "user", content: userText }];
+    setMessages(newMessages);
+
+    if (detectCrisis(userText)) {
+      setCrisisAlert(true);
+      const reply = "I’m really sorry you’re feeling this way. You’re not alone. Help is available right now.";
+      setMessages([...newMessages, { role: "assistant", content: reply }]);
+      setLoading(false);
+      return;
+    }
 
     try {
-      const res = await fetch(`${API_URL}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userText,
-          sessionId,
-          userId,
-          isAnonymous
-        })
+      let currentSessionId = sessionId;
+
+      if (!isAnonymous) {
+        if (!currentSessionId) {
+          currentSessionId = uuidv4();
+          setSessionId(currentSessionId);
+          localStorage.setItem("sessionId", currentSessionId);
+        }
+
+        const docRef = doc(db, "sessions", currentSessionId);
+        const docSnap = await getDoc(docRef);
+        
+        if (!docSnap.exists()) {
+          await setDoc(docRef, {
+            sessionId: currentSessionId,
+            userId,
+            title: userText.slice(0, 30),
+            messages: newMessages,
+            saved: false,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+        } else {
+          await updateDoc(docRef, {
+            messages: newMessages,
+            updatedAt: serverTimestamp()
+          });
+        }
+      }
+
+      const completion = await groq.chat.completions.create({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "system", content: "You are a kind, empathetic AI therapist." },
+          ...newMessages.map(m => ({ role: m.role, content: m.content }))
+        ]
       });
 
-      const data = await res.json();
+      const reply = completion.choices[0].message.content;
+      const finalMessages = [...newMessages, { role: "assistant", content: reply }];
+      
+      setMessages(finalMessages);
 
-      if (!res.ok || data.error) {
-        setMessages(prev => [
-          ...prev.filter(m => m !== undefined),
-          { role: "assistant", content: "I'm really sorry, but I'm having trouble connecting right now. Please ensure the backend server is running and try again." }
-        ]);
-        return;
+      if (!isAnonymous && currentSessionId) {
+         const docRef = doc(db, "sessions", currentSessionId);
+         await updateDoc(docRef, {
+            messages: finalMessages,
+            updatedAt: serverTimestamp()
+         });
       }
 
-      if (data.crisis) {
-        setCrisisAlert(true);
-      }
-
-      if (!isAnonymous && data.sessionId) {
-        localStorage.setItem("sessionId", data.sessionId);
-        setSessionId(data.sessionId);
-      }
-
-      setMessages(prev => [
-        ...prev.filter(m => m !== undefined),
-        { role: "assistant", content: data.reply || "I didn't quite catch that." }
-      ]);
     } catch (err) {
       console.error(err);
       setMessages(prev => [
-        ...prev.filter(m => m !== undefined),
-        { role: "assistant", content: "I'm really sorry, but I couldn't reach the server. Please check your connection." }
+        ...prev,
+        { role: "assistant", content: "I'm really sorry, but I encountered an error. Please try again." }
       ]);
     } finally {
       setLoading(false);
@@ -135,11 +184,8 @@ export default function Chat({ user }) {
   const saveSession = async () => {
     if (!sessionId) return;
     try {
-      await fetch(`${API_URL}/sessions/save`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, userId })
-      });
+      const docRef = doc(db, "sessions", sessionId);
+      await updateDoc(docRef, { saved: true, updatedAt: serverTimestamp() });
       fetchSessions();
     } catch (err) {
       console.error(err);
@@ -157,7 +203,7 @@ export default function Chat({ user }) {
   /* ---------------- DELETE SESSION ---------------- */
   const deleteSession = async (id) => {
     try {
-      await fetch(`${API_URL}/sessions/${id}?userId=${userId}`, { method: "DELETE" });
+      await deleteDoc(doc(db, "sessions", id));
       fetchSessions();
       if (id === sessionId) {
         setSessionId(null);
@@ -174,13 +220,35 @@ export default function Chat({ user }) {
   const summarizeSession = async () => {
     if (!sessionId) return;
     try {
-      const res = await fetch(`${API_URL}/summarize-session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, userId })
+      const completion = await groq.chat.completions.create({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "system",
+            content: "You are a therapist. Summarize briefly and suggest 3 coping steps."
+          },
+          {
+            role: "user",
+            content: messages.map(m => `${m.role}: ${m.content}`).join("\n")
+          }
+        ]
       });
-      const data = await res.json();
-      if (data.summary) setSessionSummary(data);
+
+      const text = completion.choices[0].message.content;
+      const [summary, steps] = text.split("Coping Steps:");
+
+      const parsedSummary = summary.trim();
+      const parsedSteps = steps ? steps.split("\n").filter(s => s.trim()) : [];
+
+      setSessionSummary({ summary: parsedSummary, copingSteps: parsedSteps });
+
+      const docRef = doc(db, "sessions", sessionId);
+      await updateDoc(docRef, {
+        summary: parsedSummary,
+        copingSteps: parsedSteps,
+        updatedAt: serverTimestamp()
+      });
+
     } catch (err) {
       console.error(err);
     }
