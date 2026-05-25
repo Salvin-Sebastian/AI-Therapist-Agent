@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : "https://ai-therapist-agent.netlify.app/");
 
 export default function Chat({ user }) {
   const isAnonymous = user.isAnonymous;
@@ -188,7 +188,7 @@ export default function Chat({ user }) {
 
   return (
     <div className="flex h-screen bg-calm-50 font-sans">
-      
+
       {/* -------- SIDEBAR -------- */}
       {!isAnonymous && (
         <aside className="w-[320px] bg-white border-r border-calm-200 p-6 flex flex-col shadow-[4px_0_24px_rgb(0,0,0,0.02)] z-10">
@@ -234,11 +234,10 @@ export default function Chat({ user }) {
               <div
                 key={s.sessionId}
                 onClick={() => setSessionId(s.sessionId)}
-                className={`p-3.5 rounded-2xl cursor-pointer flex justify-between items-center group transition-all ${
-                  s.sessionId === sessionId
+                className={`p-3.5 rounded-2xl cursor-pointer flex justify-between items-center group transition-all ${s.sessionId === sessionId
                     ? "bg-gradient-to-r from-therapeutic-50 to-white border border-therapeutic-200 shadow-sm"
                     : "hover:bg-calm-50 border border-transparent"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3 overflow-hidden">
                   <span className={`text-lg flex-shrink-0 ${s.sessionId === sessionId ? "text-therapeutic-500" : "text-calm-300"}`}>💬</span>
@@ -269,7 +268,7 @@ export default function Chat({ user }) {
 
       {/* -------- CHAT AREA -------- */}
       <main className="flex-1 flex flex-col relative overflow-hidden">
-        
+
         {/* Header (Mobile / Anonymous) */}
         {isAnonymous && (
           <header className="bg-white/80 backdrop-blur-md border-b border-calm-200 p-5 flex items-center justify-between z-10 shadow-sm">
@@ -319,27 +318,25 @@ export default function Chat({ user }) {
             messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}>
                 <div className={`flex gap-4 max-w-[85%] md:max-w-[70%] ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  
+
                   {/* Avatar */}
-                  <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold shadow-sm ${
-                    m.role === "user" ? "bg-calm-800 text-white" : "bg-gradient-to-tr from-therapeutic-200 to-therapeutic-100 text-therapeutic-800 text-lg"
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold shadow-sm ${m.role === "user" ? "bg-calm-800 text-white" : "bg-gradient-to-tr from-therapeutic-200 to-therapeutic-100 text-therapeutic-800 text-lg"
+                    }`}>
                     {m.role === "user" ? "U" : "🪴"}
                   </div>
 
                   {/* Bubble */}
-                  <div className={`px-6 py-4 rounded-3xl shadow-sm text-[15px] leading-relaxed whitespace-pre-wrap ${
-                    m.role === "user"
+                  <div className={`px-6 py-4 rounded-3xl shadow-sm text-[15px] leading-relaxed whitespace-pre-wrap ${m.role === "user"
                       ? "bg-calm-800 text-white rounded-tr-sm"
                       : "bg-white border border-calm-100 text-calm-800 rounded-tl-sm shadow-[0_4px_20px_rgb(0,0,0,0.03)]"
-                  }`}>
+                    }`}>
                     {m.content}
                   </div>
                 </div>
               </div>
             ))
           )}
-          
+
           {loading && (
             <div className="flex justify-start animate-fade-in">
               <div className="flex gap-4 max-w-[75%] flex-row">
@@ -382,10 +379,10 @@ export default function Chat({ user }) {
             </button>
           </div>
           <div className="text-center mt-3">
-             <span className="text-[11px] font-medium text-calm-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
-               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-               AI Therapy is not a substitute for professional medical advice
-             </span>
+            <span className="text-[11px] font-medium text-calm-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              AI Therapy is not a substitute for professional medical advice
+            </span>
           </div>
         </div>
       </main>
@@ -394,7 +391,7 @@ export default function Chat({ user }) {
       {sessionSummary && (
         <div className="fixed inset-0 bg-calm-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-slide-up border border-white/20">
-            
+
             <div className="p-6 md:p-8 border-b border-calm-100 flex justify-between items-center bg-gradient-to-r from-therapeutic-50 to-white rounded-t-3xl">
               <div className="flex items-center gap-4">
                 <div className="bg-gradient-to-tr from-therapeutic-200 to-therapeutic-100 text-therapeutic-800 w-12 h-12 flex items-center justify-center rounded-2xl text-2xl shadow-sm">🧠</div>
@@ -428,9 +425,9 @@ export default function Chat({ user }) {
                   </h3>
                   <div className="space-y-3.5">
                     {sessionSummary.copingSteps.map((step, idx) => {
-                       const cleanStep = step.replace(/^\d+\.\s*/, '').replace(/^[-*]\s*/, '').trim();
-                       if (!cleanStep) return null;
-                       return (
+                      const cleanStep = step.replace(/^\d+\.\s*/, '').replace(/^[-*]\s*/, '').trim();
+                      if (!cleanStep) return null;
+                      return (
                         <div key={idx} className="flex items-start gap-4 bg-white p-5 rounded-2xl border border-calm-200 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:border-therapeutic-200 transition-colors">
                           <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-therapeutic-200 to-therapeutic-100 text-therapeutic-800 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5 shadow-sm">
                             {idx + 1}
