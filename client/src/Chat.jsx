@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : "https://ai-therapist-app-final.onrender.com");
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : "https://ai-therapist-agent-xi.vercel.app");
 
 export default function Chat({ user }) {
   const isAnonymous = user.isAnonymous;
