@@ -13,7 +13,6 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔄 Auth listener
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -27,45 +26,39 @@ export default function App() {
     return () => unsub();
   }, []);
 
-  // 🔐 Google login
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
   };
 
-  // 👤 Anonymous login
   const loginAnonymously = async () => {
     await signInAnonymously(auth);
   };
 
-  // 🚪 Logout account
   const logout = async () => {
     await signOut(auth);
     localStorage.clear();
   };
 
-  // ⏳ Loading
   if (loading) {
     return (
       <div className="min-h-screen bg-calm-50 flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-therapeutic-200 border-t-therapeutic-500 rounded-full animate-spin"></div>
-        <p className="mt-4 text-calm-500 font-medium animate-pulse">Loading your space...</p>
+        <div className="w-12 h-12 border-4 border-therapeutic-100/30 border-t-therapeutic-500 rounded-full animate-spin"></div>
+        <p className="mt-4 text-calm-400 font-medium animate-pulse">Loading your space...</p>
       </div>
     );
   }
 
-  // 🔓 Not logged in
   if (!user) {
     return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-therapeutic-50 via-white to-calm-50 flex items-center justify-center p-4">
-        {/* Background decorative elements */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-therapeutic-100/50 blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-calm-200/50 blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-calm-50 via-calm-100 to-therapeutic-50 flex items-center justify-center p-4">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-therapeutic-500/5 blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-therapeutic-300/5 blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
         
-        <div className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20 p-10 space-y-8 relative z-10 animate-fade-in">
+        <div className="w-full max-w-md bg-calm-100/60 backdrop-blur-2xl rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-calm-200/20 p-10 space-y-8 relative z-10 animate-fade-in">
           
           <div className="text-center space-y-3">
-            <div className="w-20 h-20 bg-gradient-to-tr from-therapeutic-400 to-therapeutic-200 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-therapeutic-200/50 mb-6 rotate-3">
+            <div className="w-20 h-20 bg-gradient-to-tr from-therapeutic-500/20 to-therapeutic-300/10 rounded-2xl flex items-center justify-center mx-auto shadow-md border border-therapeutic-500/20 mb-6 rotate-3">
               <span className="text-4xl">🪴</span>
             </div>
             <h1 className="text-4xl font-display font-bold text-calm-800 tracking-tight">AI Therapist</h1>
@@ -77,9 +70,9 @@ export default function App() {
           <div className="space-y-4 pt-2">
             <button
               onClick={loginWithGoogle}
-              className="w-full relative group bg-therapeutic-600 text-white py-4 rounded-2xl font-semibold overflow-hidden shadow-lg shadow-therapeutic-600/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-therapeutic-600/40"
+              className="w-full relative group bg-therapeutic-500 text-calm-50 py-4 rounded-2xl font-semibold overflow-hidden shadow-lg shadow-therapeutic-500/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-therapeutic-500/30 cursor-pointer"
             >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
               <span className="relative flex items-center justify-center gap-3">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -93,7 +86,7 @@ export default function App() {
 
             <button
               onClick={loginAnonymously}
-              className="w-full bg-white border-2 border-calm-100 py-4 rounded-2xl text-calm-600 font-medium hover:bg-calm-50 hover:border-calm-200 transition-all hover:-translate-y-0.5"
+              className="w-full bg-calm-200/40 border border-calm-300/20 py-4 rounded-2xl font-semibold hover:bg-calm-200/80 hover:border-calm-300/40 transition-all hover:-translate-y-0.5 cursor-pointer text-calm-700"
             >
               Continue Anonymously
             </button>
@@ -107,17 +100,9 @@ export default function App() {
     );
   }
 
-  // ✅ Logged in
   return (
-    <div className="relative h-screen bg-calm-50">
-      <button
-        onClick={logout}
-        className="absolute z-50 top-4 right-4 bg-white/50 backdrop-blur border border-white/40 text-sm text-calm-500 hover:text-red-500 px-4 py-2 rounded-full shadow-sm transition-colors"
-      >
-        Sign Out
-      </button>
-
-      <Chat user={user} />
+    <div className="relative h-dvh bg-calm-50 overflow-hidden">
+      <Chat user={user} logout={logout} />
     </div>
   );
 }

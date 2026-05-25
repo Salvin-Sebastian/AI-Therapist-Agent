@@ -1,47 +1,60 @@
 @import "tailwindcss";
 
 @theme {
-  --color-calm-50: #f8fafc;
-  --color-calm-100: #f1f5f9;
-  --color-calm-200: #e2e8f0;
-  --color-calm-300: #cbd5e1;
-  --color-calm-400: #94a3b8;
-  --color-calm-500: #64748b;
-  --color-calm-600: #475569;
-  --color-calm-700: #334155;
-  --color-calm-800: #1e293b;
-  --color-calm-900: #0f172a;
+  --color-calm-50: #0a0e17;
+  --color-calm-100: #0f1626;
+  --color-calm-200: #1e293b;
+  --color-calm-300: #334155;
+  --color-calm-400: #475569;
+  --color-calm-500: #94a3b8;
+  --color-calm-600: #cbd5e1;
+  --color-calm-700: #e2e8f0;
+  --color-calm-800: #f8fafc;
+  --color-calm-900: #ffffff;
 
-  --color-therapeutic-50: #f0fdfa;
-  --color-therapeutic-100: #ccfbf1;
-  --color-therapeutic-200: #99f6e4;
-  --color-therapeutic-300: #5eead4;
-  --color-therapeutic-400: #2dd4bf;
-  --color-therapeutic-500: #14b8a6;
-  --color-therapeutic-600: #0d9488;
-  --color-therapeutic-700: #0f766e;
-  --color-therapeutic-800: #115e59;
-  --color-therapeutic-900: #134e4a;
+  --color-therapeutic-50: #022c22;
+  --color-therapeutic-100: #064e3b;
+  --color-therapeutic-200: #047857;
+  --color-therapeutic-300: #10b981;
+  --color-therapeutic-400: #34d399;
+  --color-therapeutic-500: #10b981;
+  --color-therapeutic-600: #059669;
+  --color-therapeutic-700: #047857;
+  --color-therapeutic-800: #065f46;
+  --color-therapeutic-900: #064e3b;
 
   --font-sans: "Inter", "system-ui", "sans-serif";
   --font-display: "Outfit", "system-ui", "sans-serif";
 
-  --animate-fade-in: fadeIn 0.5s ease-out;
-  --animate-slide-up: slideUp 0.4s ease-out forwards;
-  --animate-slide-down: slideDown 0.4s ease-out forwards;
-  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-fade-in: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-slide-down: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-calm-300) transparent;
+  }
+
+  html, body, #root {
+    height: 100dvh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
   body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    color: var(--color-calm-800);
+    color: var(--color-calm-700);
     background-color: var(--color-calm-50);
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    color: var(--color-calm-800);
   }
 }
 
@@ -51,16 +64,15 @@
 }
 
 @keyframes slideUp {
-  0% { opacity: 0; transform: translateY(10px); }
+  0% { opacity: 0; transform: translateY(14px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideDown {
-  0% { opacity: 0; transform: translateY(-10px); }
+  0% { opacity: 0; transform: translateY(-14px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
