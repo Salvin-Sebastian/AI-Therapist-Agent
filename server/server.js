@@ -15,7 +15,7 @@ const app = express();
 /* ✅ CORS */
 app.use(
   cors({
-    origin: "https://rose-ai-therapist.netlify.app",
+    origin: ["https://rose-ai-therapist.netlify.app", "http://localhost:5173", "http://localhost:3000"],
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
