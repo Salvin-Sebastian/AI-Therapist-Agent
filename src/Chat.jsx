@@ -584,8 +584,8 @@ export default function Chat({ user, logout }) {
                   sendMessage();
                 }
               }}
-              placeholder="Share your thoughts..."
-              className="flex-1 bg-transparent border-none focus:ring-0 outline-none h-11 md:h-12 px-4 md:px-5 text-slate-100 placeholder:text-slate-400 text-sm md:text-[15px]"
+              placeholder="What's on your mind?"
+              className="flex-1 bg-transparent border-none focus:ring-0 outline-none h-11 md:h-12 pl-10 pr-4 md:pl-14 md:pr-5 text-slate-100 placeholder:text-slate-400 text-sm md:text-[15px]"
             />
             <button
               onClick={sendMessage}
