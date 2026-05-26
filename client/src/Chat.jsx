@@ -168,7 +168,7 @@ export default function Chat({ user, logout }) {
         ? `You are a kind, empathetic, and professional AI therapist. The user's name is ${userName}. Welcome them warmly, and greet them by name when appropriate in your responses to make the therapy feel personal, safe, and supportive.`
         : "You are a kind, empathetic, and professional AI therapist.";
 
-      const response = await fetch("http://localhost:3001/api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -290,7 +290,7 @@ export default function Chat({ user, logout }) {
   const summarizeSession = async () => {
     if (messages.length === 0) return;
     try {
-      const response = await fetch("http://localhost:3001/api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
