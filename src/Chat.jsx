@@ -1,10 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { db } from "./firebase";
 import { collection, doc, setDoc, getDocs, getDoc, deleteDoc, query, where, updateDoc, serverTimestamp } from "firebase/firestore";
-import Groq from "groq-sdk";
-import { v4 as uuidv4 } from "uuid";
-
-const groq = new Groq({ apiKey: import.meta.env.VITE_GROQ_API_KEY, dangerouslyAllowBrowser: true });
 
 const CRISIS_KEYWORDS = [
   "kill myself",
@@ -172,15 +168,23 @@ export default function Chat({ user, logout }) {
         ? `You are a kind, empathetic, and professional AI therapist. The user's name is ${userName}. Welcome them warmly, and greet them by name when appropriate in your responses to make the therapy feel personal, safe, and supportive.`
         : "You are a kind, empathetic, and professional AI therapist.";
 
-      const completion = await groq.chat.completions.create({
-        model: "llama-3.1-8b-instant",
-        messages: [
-          { role: "system", content: systemContent },
-          ...newMessages.map(m => ({ role: m.role, content: m.content }))
-        ]
+      const response = await fetch("http://localhost:3001/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          systemContent: systemContent
+        })
       });
 
-      const reply = completion.choices[0].message.content;
+      if (!response.ok) {
+        throw new Error("Failed to fetch response from backend.");
+      }
+
+      const data = await response.json();
+      const reply = data.reply;
       const finalMessages = [...newMessages, { role: "assistant", content: reply }];
       
       setMessages(finalMessages);
@@ -286,21 +290,28 @@ export default function Chat({ user, logout }) {
   const summarizeSession = async () => {
     if (messages.length === 0) return;
     try {
-      const completion = await groq.chat.completions.create({
-        model: "llama-3.1-8b-instant",
-        messages: [
-          {
-            role: "system",
-            content: "You are a therapist. Summarize briefly and suggest 3 coping steps."
-          },
-          {
-            role: "user",
-            content: messages.map(m => `${m.role}: ${m.content}`).join("\n")
-          }
-        ]
+      const response = await fetch("http://localhost:3001/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content: messages.map(m => `${m.role}: ${m.content}`).join("\n")
+            }
+          ],
+          systemContent: "You are a therapist. Summarize briefly and suggest 3 coping steps."
+        })
       });
 
-      const text = completion.choices[0].message.content;
+      if (!response.ok) {
+        throw new Error("Failed to fetch summary from backend.");
+      }
+
+      const data = await response.json();
+      const text = data.reply;
       
       let parsedSummary = text.trim();
       let parsedSteps = [];
