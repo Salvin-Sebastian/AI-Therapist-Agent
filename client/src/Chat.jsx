@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { db } from "./firebase";
 import { collection, doc, setDoc, getDocs, getDoc, deleteDoc, query, where, updateDoc, serverTimestamp } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
 
 const CRISIS_KEYWORDS = [
   "kill myself",
